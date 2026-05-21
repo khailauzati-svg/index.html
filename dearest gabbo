@@ -1,0 +1,309 @@
+# index.html<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blue Aura Room 2.0</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffffff, #d9f2ff, #cfefff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 380px;
+      padding: 28px;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(126, 200, 255, 0.4);
+      box-shadow: 0 10px 40px rgba(126, 200, 255, 0.3);
+      text-align: center;
+    }
+
+    h1 {
+      color: #7ec8ff;
+      font-size: 22px;
+    }
+
+    p {
+      color: #7aaed6;
+      font-size: 14px;
+    }
+
+    input {
+      margin-top: 12px;
+      padding: 10px;
+      width: 90%;
+      border-radius: 12px;
+      border: 1px solid #bde6ff;
+      text-align: center;
+      outline: none;
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #7ec8ff;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .icon {
+      font-size: 45px;
+      margin-bottom: 8px;
+    }
+
+    .envelope {
+      font-size: 70px;
+      cursor: pointer;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .petal {
+      position: absolute;
+      top: -10px;
+      font-size: 18px;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .fade-in {
+      animation: fade 1s ease-in;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .poem {
+      margin-top: 10px;
+      white-space: pre-line;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <div class="card" id="loginBox">
+    <div class="icon">🫧💙</div>
+    <h1>welcome</h1>
+    <p>enter your name + password</p>
+
+    <input id="name" placeholder="your name">
+    <input id="password" type="password" placeholder="password">
+
+    <button onclick="check()">enter</button>
+    <p id="error" style="color:#ff8aa1;"></p>
+  </div>
+
+  <!-- ENVELOPE -->
+  <div class="card hidden fade-in" id="envBox">
+    <div class="icon">💌</div>
+    <h1 id="greet"></h1>
+    <p>a letter is waiting for you</p>
+
+    <div class="envelope" onclick="openLetter()">✉️</div>
+  </div>
+
+  <!-- MESSAGE -->
+  <div class="card hidden fade-in" id="msgBox">
+    <div class="icon">💙</div>
+    <h1>A year full of love and patience</h1>
+    <p>happy anniversary love, I hope this little surprise would make you feel special and happy.</p>
+    <button onclick="goGift()">continue</button>
+  </div>
+
+  <!-- GIFT -->
+  <div class="card hidden fade-in" id="giftBox">
+    <div class="icon">🎁</div>
+    <h1>a small gift</h1>
+
+    <div class="envelope" onclick="openGift()">🌸</div>
+
+    <p id="giftText" class="hidden" style="margin-top:10px;">
+    <h1>Happy Anniversary, my love!</h1>
+    What a roller coaster year it has been for us—filled with ups and downs, challenges, lessons, laughter, and unforgettable moments. Through every twist and turn, we still found our way back to each other. Thank you for staying, for understanding me, and for choosing us despite everything.<br><br>
+
+    I’m so grateful for all the memories we’ve shared and for the love that continues to grow stronger through it all. I’m proud of you, proud of the way you keep going even when things get heavy, and proud of us for not giving up on each other no matter how hard things got.<br><br>
+
+    No matter how difficult things became, having you beside me made every challenge easier to face. Thank you for being my comfort, my strength, and my safe place, bub.<br><br>
+
+    I love you, my denise.
+    </p>
+
+    <button id="poemBtn" class="hidden" onclick="goPoem()">read poem</button>
+  </div>
+
+  <!-- POEM -->
+  <div class="card hidden fade-in" id="poemBox">
+    <div class="icon">🌙</div>
+    <h1>a poem for you</h1>
+    <p class="poem" id="poem"></p>
+  </div>
+
+  <!-- 🎧 MUSIC -->
+  <div id="player" class="hidden"></div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    let userName = "";
+    let player;
+    let fadeInterval;
+    /* YouTube */
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '0',
+        width: '0',
+        videoId: 'y1cBhJLNNXU',
+        playerVars: {
+          autoplay: 0,
+          loop: 1,
+          playlist: 'y1cBhJLNNXU'
+        },
+        events: {
+          onReady: () => player.setVolume(0)
+        }
+      });
+    }
+    /* fade-in audio */
+    function fadeInAudio() {
+      let vol = 0;
+      clearInterval(fadeInterval);
+      fadeInterval = setInterval(() => {
+        if (vol < 100) {
+          vol += 2;
+          player.setVolume(vol);
+        } else {
+          clearInterval(fadeInterval);
+        }
+      }, 120);
+    }
+    /* LOGIN */
+    function check() {
+      const name = document.getElementById("name").value;
+      const pass = document.getElementById("password").value;
+      if (pass === "gabbo") {
+        userName = name || "you";
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("envBox").classList.remove("hidden");
+        document.getElementById("greet").innerText =
+          `a letter for ${userName}`;
+        document.getElementById("player").classList.remove("hidden");
+        player.playVideo();
+        fadeInAudio();
+      } else {
+        document.getElementById("error").innerText = "wrong password :(";
+      }
+    }
+
+    function openLetter() {
+      document.getElementById("envBox").classList.add("hidden");
+      document.getElementById("msgBox").classList.remove("hidden");
+    }
+
+    function goGift() {
+      document.getElementById("msgBox").classList.add("hidden");
+      document.getElementById("giftBox").classList.remove("hidden");
+    }
+
+    function openGift() {
+      document.getElementById("giftText").classList.remove("hidden");
+      document.getElementById("poemBtn").classList.remove("hidden");
+    }
+
+    function goPoem() {
+      document.getElementById("giftBox").classList.add("hidden");
+      document.getElementById("poemBox").classList.remove("hidden");
+      typePoem();
+    }
+    /* poem */
+    const poemText = `Even oceans learn to whisper your name,
+when night falls quiet and I feel the same.
+You’re far away, yet never gone—
+your love still holds me, keeps me strong.
+
+I don’t see you, but still I know
+the way your care continues to flow.
+Through distance wide and unseen space,
+you give my heart a resting place.
+
+And when life breaks and days turn cold,
+your love becomes the hand I hold.
+No matter how the miles may lie,
+you are my calm, my steady sky.`;
+
+    function typePoem() {
+      let i = 0;
+      const el = document.getElementById("poem");
+      el.innerHTML = "";
+
+      function typing() {
+        if (i < poemText.length) {
+          el.innerHTML += poemText.charAt(i);
+          i++;
+          setTimeout(typing, 25);
+        }
+      }
+      typing();
+    }
+  </script>
+
+</body>
+
+</html>
